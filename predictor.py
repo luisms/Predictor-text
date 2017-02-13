@@ -20,17 +20,13 @@ def reemplaza(archivo):
     archivo = archivo.replace(';',' ')
     archivo = archivo.replace(']','')
     archivo = archivo.replace('[','')
+    archivo = archivo.replace(')','')
+    archivo = archivo.replace('(','')
     #archivo = archivo.replace(patron,'')    
     archivo = patron.sub('',archivo)    
     return archivo.lower()
 #quita las entradas vacias del diccionario
-#ESTE METODO NO SE USA
-def limpia( diccionario):
-    diccionarioAux = {}
-    for i in diccionario:
-        if(diccionario.get(i) != 0.0):
-            diccionarioAux[i]=diccionario.get(i)    
-    return diccionarioAux
+
 
 
 #codifica la cadena de numeros para elegir la letra más frecuente
@@ -52,7 +48,7 @@ def descomprime(l):
         res.append([cont,prev] if cont>1 else prev)
         return res
 
-def unigram(archivo):
+def unigramLetras(archivo):
     a = 0
     diccionario = {}    
     patron2 = re.compile("\w")
@@ -64,7 +60,7 @@ def unigram(archivo):
     return (diccionario)
 
 
-def bigram(archivo):
+def bigramLetras(archivo):
     a = 0
     diccionario = {}        
     for i in "abcdefghijklmnñopqrstuvwxyz":
@@ -90,7 +86,7 @@ def decodificaBigramLetras(numeros,diccionarioUni,diccionarioBi,teclado):
     posPalabra = 0
     #Recorre los distintos numeros que se encontraban separados por espacios
     for numero in numeros:    
-        #Se genera la primera letra a partir del unigram
+        #Se genera la primera letra a partir del unigramLetras
         valDigito = (teclado.get(int(numero[0])))            
         letraI=valDigito[0]
         frecuenciaI = diccionarioUni.get(valDigito[0])            
@@ -114,6 +110,36 @@ def decodificaBigramLetras(numeros,diccionarioUni,diccionarioBi,teclado):
             posLetra += 1
         posPalabra += 1
 
+def unigramPalabras(archivo):
+	a = 0
+	diccionario = {}
+	total =archivo.split()     
+	for i in range (len(total)):
+		if(total [i] in diccionario):
+			diccionario[i] = 0
+		else:
+			diccionario =  diccionario.get(i)+1
+	return (diccionario)
+
+
+###almacenar en diccionari ####
+
+# almacenar un diccionario en un fichero
+def guarda (texto):
+	with open("unigram", 'w') as f:
+    		for key, value in texto.items():
+        		f.write('%s:%s\n' % (key, value))
+#lee un diccionario de un fichero y lo carga en memoria
+def lee():
+	data = dict()
+	
+	with open("unigram") as raw_data:
+				
+		for item in raw_data:
+			if (':' in item):
+				key,value = item.split(':', 1)
+				data[key]= value[:-1]
+	return data
 
 
 
@@ -129,8 +155,13 @@ teclado[9] = ["w","x","y","z"]
 
 
 archivo = readWords("texto")
-diccionarioUni=unigram(archivo)
-diccionarioBi=bigram(archivo)
+diccionarioUni=unigramLetras(archivo)
+diccionarioBi=bigramLetras(archivo)
 
 numeros = "42782 58346 5847"
 (decodificaBigramLetras(numeros,diccionarioUni,diccionarioBi,teclado))
+a = unigramLetras(archivo)
+guarda(a)
+a =  (lee())
+print (a.keys())
+print (a.values())
